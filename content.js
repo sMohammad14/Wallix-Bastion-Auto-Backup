@@ -1,0 +1,218 @@
+const sleep = (ms) => new Promise(res => setTimeout(res, ms));
+
+let isBackupInProgress = false;
+let isWaitingForDownload = false;
+
+async function generateIdentityFile(fileName, secret) {
+    const timestamp = new Date().toLocaleString();
+    const border = "-".repeat(98);
+    const content = `${border}\n|                                Created by Wallix Bastion Auto Backup Chrome Extention                                |\n${border}\n| File Name: ${fileName.padEnd(87)}|\n| Password: ${secret.padEnd(88)}|\n| Date: ${timestamp.padEnd(92)}|\n${border}\n|                                                                 by sMohammad14 (@github)                                 |\n${border}`;
+
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${fileName}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
+async function startEngine() {
+    const store = await chrome.storage.local.get(['url', 'user', 'pass', 'secret', 'active']);
+    if (!store.active) {
+        return;
+    }
+
+    if (isWaitingForDownload) {
+        await monitorForDownloadLink(store);
+        return;
+    }
+
+    if (isBackupInProgress) {
+        await monitorForDownloadLink(store);
+        return;
+    }
+
+    await sleep(15000);
+    
+    if (isWaitingForDownload) {
+        return;
+    }
+    
+    const currentPath = window.location.pathname;
+    const baseUrl = store.url;
+    
+    if (currentPath.includes("/ui/system/backup-restore") || currentPath.includes("/configs/backup/")) {
+        await performBackup(store);
+    } 
+    else if (currentPath.includes("/ui/login")) {
+        await performLogin(store);
+        
+        await sleep(15000);
+        
+        if (isWaitingForDownload) {
+            return;
+        }
+        
+        const newPath = window.location.pathname;
+        
+        if (newPath.includes("/configs/backup/") || newPath.includes("/ui/system/backup-restore")) {
+            await performBackup(store);
+        } 
+        else {
+            window.location.href = baseUrl + "/ui/system/backup-restore";
+            
+            await sleep(15000);
+            await performBackup(store);
+        }
+    }
+}
+
+async function performLogin(store) {
+    const u = document.getElementsByName("userName")[0];
+    const p = document.getElementsByName("password")[0];
+    
+    if (u && p) {
+        u.value = store.user; 
+        u.dispatchEvent(new Event('input', { bubbles: true }));
+        
+        await sleep(5000);
+        
+        p.value = store.pass; 
+        p.dispatchEvent(new Event('input', { bubbles: true }));
+        
+        await sleep(5000);
+        
+        const loginButton = Array.from(document.querySelectorAll('button, input[type="submit"], a')).find(el => {
+            const text = (el.innerText || el.value || '').trim().toLowerCase().replace(/\s+/g, '');
+            return text === 'login' || text === 'login';
+        });
+        
+        if (loginButton) {
+            loginButton.click();
+        }
+    }
+}
+
+async function performBackup(store) {
+    if (isWaitingForDownload) {
+        await monitorForDownloadLink(store);
+        return;
+    }
+    
+    const iframe = document.getElementById('djangoIframe');
+    if (!iframe) {
+        return;
+    }
+
+    const getIframeDoc = () => {
+        try { return iframe.contentDocument || iframe.contentWindow.document; } 
+        catch (e) { return null; }
+    };
+
+    let doc = getIframeDoc();
+    if (!doc) {
+        return;
+    }
+
+    const s1 = doc.getElementById('id_secret1');
+    
+    const createButton = Array.from(doc.querySelectorAll('button, input[type="submit"], a, [role="button"]')).find(el => {
+        const text = (el.innerText || el.value || el.textContent || '').trim().toLowerCase();
+        return text.includes('create');
+    });
+
+    if (s1) {
+        s1.focus(); 
+        s1.value = store.secret;
+        s1.dispatchEvent(new Event('input', { bubbles: true }));
+        
+        await sleep(5000);
+        
+        if (isWaitingForDownload) {
+            return;
+        }
+        
+        const s2 = doc.getElementById('id_secret2');
+        if (s2) {
+            s2.disabled = false; 
+            s2.focus(); 
+            s2.value = store.secret;
+            s2.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        
+        await sleep(5000);
+        
+        if (isWaitingForDownload) {
+            return;
+        }
+        
+        if (createButton) {
+            isBackupInProgress = true;
+            isWaitingForDownload = true;
+            createButton.click();
+            
+            await monitorForDownloadLink(store);
+        } else {
+            return;
+        }
+    }
+}
+
+async function monitorForDownloadLink(store) {
+    let attempts = 0;
+    const maxAttempts = 720;
+    
+    isWaitingForDownload = true;
+    
+    return new Promise((resolve) => {
+        const checkDL = setInterval(() => {
+            attempts++;
+            
+            const iframe = document.getElementById('djangoIframe');
+            if (!iframe) return;
+            
+            try {
+                const doc = iframe.contentDocument || iframe.contentWindow.document;
+                if (!doc) return;
+
+                const allLinks = doc.querySelectorAll('a');
+                const wbkLink = Array.from(allLinks).find(link => 
+                    link.href && link.href.toLowerCase().includes('.wbk')
+                );
+
+                if (wbkLink) {
+                    const fullUrl = wbkLink.href;
+                    const fileName = fullUrl.split('/').filter(Boolean).pop() || "backup.wbk";
+
+                    chrome.runtime.sendMessage({ action: "DOWNLOAD_FILE", url: fullUrl, filename: fileName });
+                    generateIdentityFile(fileName, store.secret);
+                    
+                    clearInterval(checkDL);
+                    chrome.storage.local.set({ active: false });
+                    
+                    isBackupInProgress = false;
+                    isWaitingForDownload = false;
+
+                    setTimeout(() => {
+                        chrome.runtime.sendMessage({ action: "CLOSE_TAB" });
+                        resolve();
+                    }, 10000);
+                }
+
+                if (attempts >= maxAttempts) {
+                    clearInterval(checkDL);
+                    
+                    isBackupInProgress = false;
+                    isWaitingForDownload = false;
+                    
+                    resolve();
+                }
+            } catch (e) {
+            }
+        }, 5000);
+    });
+}
+
+startEngine();
