@@ -128,8 +128,16 @@ https://github.com/sMohammad14/Wallix-Bastion-Auto-Backup/archive/refs/heads/mai
 
 ## توضیح مهم
 
-این افزونه عملیات را از طریق رابط کاربری وب شبیه‌سازی می‌کند.  
+این افزونه عملیات را از طریق رابط کاربری وب شبیه‌سازی می‌کند.
 
+---
+
+## تصاویر
+![Auto Backup Screenshot](screenshots/autobck%20(2).png)
+
+![Auto Backup Screenshot](screenshots/autobck%20(1).png)
+
+![Auto Backup Screenshot](screenshots/autobck%20(3).png)
 
 # Wallix Bastion Auto Backup (Chrome Extension)
 
@@ -263,5 +271,12 @@ Disable:
 ## Disclaimer
 
 This extension automates UI-based operations.  
-Use it responsibly and test in non-production environments before deploying in production systems.
 
+---
+
+## Screenshots
+![Auto Backup Screenshot](screenshots/autobck%20(2).png)
+
+![Auto Backup Screenshot](screenshots/autobck%20(1).png)
+
+![Auto Backup Screenshot](screenshots/autobck%20(3).png)
