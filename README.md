@@ -1,3 +1,6 @@
+# فارسی
+---
+
 # افزونه Wallix Bastion Auto Backup
 
 ![نسخه](https://img.shields.io/badge/version-1.0-blue)
@@ -118,6 +121,9 @@ https://github.com/sMohammad14/Wallix-Bastion-Auto-Backup/archive/refs/heads/mai
 
 ![Auto Backup Screenshot](screenshots/autobck%20(3).png)
 
+# English
+
+---
 # Wallix Bastion Auto Backup Extension
 
 ![Version](https://img.shields.io/badge/version-1.0-blue)
@@ -239,6 +245,10 @@ Keep in mind that if you have Maintenance access, you must download backup files
 
 ![Auto Backup Screenshot](screenshots/autobck%20(3).png)
 
+
+# Русский
+
+---
 
 # Расширение Wallix Bastion Auto Backup
 
@@ -362,7 +372,9 @@ https://github.com/sMohammad14/Wallix-Bastion-Auto-Backup/archive/refs/heads/mai
 ![Auto Backup Screenshot](screenshots/autobck%20(3).png)
 
 
+# 中文
 
+---
 # Wallix Bastion 自动备份扩展
 
 ![版本](https://img.shields.io/badge/version-1.0-blue)
