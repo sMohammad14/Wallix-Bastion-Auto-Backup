@@ -1,5 +1,9 @@
 # فارسی
 ---
+# آپدیت 1.1
+- رفع خطای No data received, please refresh the page. پس از لاگین به سامانه 
+- اشتباه املایی اپدیت قبلی برطرف شد!
+
 # آپدیت
 - آیکون با نشانگر فعلا و غیر فعال بودن افزونه اضافه شد
 - فایل دانلودی شامل اطلاعات دانلود شده فایل بکاپ اشتباه املایی دارد که در آپدیت بعدی مرتبع خواهد شد!
@@ -126,9 +130,20 @@ https://github.com/sMohammad14/Wallix-Bastion-Auto-Backup/archive/refs/heads/mai
 # English
 
 ---
+
+# Update 1.1
+- Fixed "No data received, please refresh the page." error after logging into the system
+- Fixed typo from previous update!
+
+# Update
+- Added dynamic icon to indicate extension active/inactive status
+- The downloaded information file for the backup file had a spelling error that will be fixed in the next update
+
+---
+
 # Wallix Bastion Auto Backup Extension
 
-![Version](https://img.shields.io/badge/version-1.0-blue)
+![Version](https://img.shields.io/badge/version-1.1-blue)
 ![Platform](https://img.shields.io/badge/platform-Chrome_Extension-green)
 ![License](https://img.shields.io/badge/license-Private-lightgrey)
 
